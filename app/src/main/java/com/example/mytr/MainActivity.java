@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,8 +19,10 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.google.firebase.ml.vision.text.RecognizedLanguage;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,7 +67,33 @@ public class MainActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
                             @Override
                             public void onSuccess(FirebaseVisionText result) {
-                               resultTv.setText(result.getText());
+                              // resultTv.setText(result.getText());
+
+                                String resultText = result.getText();
+                                for (FirebaseVisionText.TextBlock block: result.getTextBlocks()) {
+                                    String blockText = block.getText();
+                                    Float blockConfidence = block.getConfidence();
+                                    List<RecognizedLanguage> blockLanguages = block.getRecognizedLanguages();
+                                    Point[] blockCornerPoints = block.getCornerPoints();
+                                    Rect blockFrame = block.getBoundingBox();
+                                    for (FirebaseVisionText.Line line: block.getLines()) {
+                                        String lineText = line.getText();
+                                        Float lineConfidence = line.getConfidence();
+                                        List<RecognizedLanguage> lineLanguages = line.getRecognizedLanguages();
+                                        Point[] lineCornerPoints = line.getCornerPoints();
+                                        Rect lineFrame = line.getBoundingBox();
+                                        for (FirebaseVisionText.Element element: line.getElements()) {
+                                            resultTv.append(element.getText()+" ");
+                                            String elementText = element.getText();
+                                            Float elementConfidence = element.getConfidence();
+                                            List<RecognizedLanguage> elementLanguages = element.getRecognizedLanguages();
+                                            Point[] elementCornerPoints = element.getCornerPoints();
+                                            Rect elementFrame = element.getBoundingBox();
+                                        }
+                                        resultTv.append("\n");
+                                    }
+                                    resultTv.append("\n\n");
+                                }
                             }
                         })
                         .addOnFailureListener(
